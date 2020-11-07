@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import './App.css';
 import shuffle from 'lodash.shuffle';
-import { store } from './store';
+import { store } from './like-redux/store';
 import { Card } from './components/Card';
+import { ZEROING, SET_OPENED, SET_MATCHED, SET_MOVES } from './like-redux/constants';
+import { matchedReducer, movesReducer, openedReducer } from './like-redux/reducers';
 
 const cards = store.cards;
 
 const doubleCards = shuffle([...cards, ...cards]);
 
 export const App = () => {
-  const [opened, setOpened] = useState([]);
-  const [matched, setMatched] = useState([]);
-  const [moves, setMoves] = useState(0);
+  const [opened, setOpened] = useReducer(openedReducer, []);
+  const [matched, setMatched] = useReducer(matchedReducer, []);
+  const [moves, setMoves] = useReducer(movesReducer, 0);
 
   useEffect(() => {
     if (opened.length < 2) return;
@@ -20,13 +22,14 @@ export const App = () => {
     const secondCard = doubleCards[opened[1]];
 
     if(firstCard.color === secondCard.color) {
-      setMatched((matched) => [...matched, firstCard.id]);
+      setMatched({type: SET_MATCHED, firstCardId: firstCard.id})
     }
 
   }, [opened]);
 
   useEffect(() => {
-    if (opened.length === 2) setTimeout(() => setOpened([]), 800);
+    if (opened.length === 2) setTimeout(() => setOpened({type: ZEROING}), 800);
+
   }, [opened]);
 
   useEffect(() => {
@@ -34,13 +37,14 @@ export const App = () => {
   }, [matched])
 
   function flipCard(index) {
-    setOpened(opened => [...opened, index]);
-    setMoves((moves) => moves + 1);  
+    setOpened({type: SET_OPENED, index});
+    setMoves({type: SET_MOVES});
   }
+  const rounds = Math.floor(moves/2);
 
   return <div className='app'>
     <p>
-      {Math.floor(moves/2)}
+      {rounds}
       <strong> rounds</strong>
     </p>
     <div className='cards'>
@@ -51,15 +55,15 @@ export const App = () => {
       if (matched.includes(card.id)) isFlipped = true;
 
       return (
-    <Card 
-      key={index} 
-      index={index} 
-      card={card} 
-      isFlipped={isFlipped} 
-      flipCard={flipCard} 
-    />
+        <Card 
+          key={index} 
+          index={index} 
+          card={card} 
+          isFlipped={isFlipped} 
+          flipCard={flipCard} 
+        />
       )
-  })}
+    })}
     </div>
   </div>
 }
