@@ -3,8 +3,7 @@ import './App.css';
 import shuffle from 'lodash.shuffle';
 import { store } from './like-redux/store';
 import { Card } from './components/Card';
-import { ZEROING, SET_OPENED, SET_MATCHED, SET_MOVES } from './like-redux/constants';
-import { matchedReducer, movesReducer, openedReducer } from './like-redux/reducers';
+import { matchedReducer, movesReducer, openedReducer, ZEROING, SET_OPENED, SET_MATCHED, SET_MOVES } from './like-redux/reducers';
 
 const cards = store.cards;
 
